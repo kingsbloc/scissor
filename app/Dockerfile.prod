@@ -1,0 +1,14 @@
+FROM amd64/golang:1.18
+
+WORKDIR /app
+
+COPY go.sum .
+COPY go.mod .
+
+RUN go mod download
+
+COPY . .
+
+RUN go build -o ./out/dist ./cmd
+
+CMD ./out/dist

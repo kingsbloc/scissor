@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  api:
+    build: 
+      context: ./app
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    command: air
+    volumes:
+      - ./app/:/app/
+    env_file:
+      - ./app/.env
+    depends_on:
+      - db
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
+      # db:
+      #   condition: service_completed_successfully
+    networks:
+      - scissor-network
+    links:
+      - db
+
+  db:
+    container_name: scissor_db
+    image: postgres:14.1-alpine
+    restart: always
+    env_file:
+      - ./app/.env
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - scissor-network
+  
+  redis:
+    container_name: scissor_redis
+    image: redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ./redis/data:/data
+    sysctls:
+      - net.core.somaxconn=511
+    ports:
+      - "6379:6379"
+    networks:
+      - scissor-network
+
+volumes:
+  db:
+    driver: local
+
+networks:
+  scissor-network:
+    driver: bridge
