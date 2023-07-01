@@ -12,6 +12,7 @@ import (
 	"github.com/kingsbloc/scissor/internal/config"
 	"github.com/kingsbloc/scissor/internal/models"
 	"github.com/kingsbloc/scissor/internal/repositories"
+	"github.com/kingsbloc/scissor/internal/routes"
 )
 
 func init() {
@@ -50,6 +51,9 @@ func main() {
 
 	// Create New DAO
 	repositories.NewDAO(dbConn)
+
+	// Register Routes
+	routes.RegisterRoutes(r)
 
 	// Serve and listen
 	log.Fatal(http.ListenAndServe(":"+port, r))
