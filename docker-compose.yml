@@ -22,6 +22,7 @@ services:
     networks:
       - scissor-network
     links:
+      - redis
       - db
 
   db:
