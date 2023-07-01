@@ -24,3 +24,8 @@ func InitDB() (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	return db, err
 }
+
+// AutoMigration Setup
+func AutoMigrate(models []interface{}, db *gorm.DB) {
+	db.AutoMigrate(models...)
+}

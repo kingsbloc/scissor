@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/render"
 	"github.com/joho/godotenv"
 	"github.com/kingsbloc/scissor/internal/config"
+	"github.com/kingsbloc/scissor/internal/models"
 	"github.com/kingsbloc/scissor/internal/repositories"
 )
 
@@ -41,6 +42,11 @@ func main() {
 		log.Fatal(dbErr)
 	}
 	log.Println("==== DB connected")
+
+	// AutoMigrate Models
+	repositories.AutoMigrate([]interface{}{
+		&models.User{},
+	}, dbConn)
 
 	// Create New DAO
 	repositories.NewDAO(dbConn)
