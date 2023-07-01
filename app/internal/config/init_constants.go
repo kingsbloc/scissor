@@ -22,7 +22,7 @@ func InitConstants() {
 	}
 	docs.SwaggerInfo.Host = HOST_URL
 	docs.SwaggerInfo.Version = "0.1"
-	docs.SwaggerInfo.Title = "School Management System API"
+	docs.SwaggerInfo.Title = "Scissor API"
 	docs.SwaggerInfo.Schemes = SCHEMES
 	docs.SwaggerInfo.BasePath = "/"
 }

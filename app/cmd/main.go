@@ -1,18 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"github.com/joho/godotenv"
+	"github.com/kingsbloc/scissor/internal/app"
 	"github.com/kingsbloc/scissor/internal/config"
 	"github.com/kingsbloc/scissor/internal/models"
 	"github.com/kingsbloc/scissor/internal/repositories"
 	"github.com/kingsbloc/scissor/internal/routes"
+	"github.com/kingsbloc/scissor/internal/services"
 )
 
 func init() {
@@ -23,14 +25,28 @@ func init() {
 	config.InitConstants()
 }
 
+// @description	This is scissor server.
+// @BasePath	/
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// schemes: [http, https]
+
 func main() {
-	port := os.Getenv("PORT")
+	c := config.New()
 
 	// Init the main Router
 	r := chi.NewRouter()
 
 	// Add Middlewares
+	r.Use(
+		middleware.AllowContentType("application/json"),
+		middleware.SetHeader("X-Content-Type-Options", "nosniff"),
+		middleware.SetHeader("X-Frame-Options", "deny"),
+	)
 	r.Use(middleware.CleanPath)
+	r.Use(middleware.RequestID)
+	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(render.SetContentType(render.ContentTypeJSON))
@@ -51,11 +67,28 @@ func main() {
 	}, dbConn)
 
 	// Create New DAO
-	repositories.NewDAO(dbConn)
+	dao := repositories.NewDAO(dbConn)
+
+	// create services
+	userService := services.NewUserService(dao)
+
+	srv := app.NewMicroServices(userService)
 
 	// Register Routes
-	routes.RegisterRoutes(r)
+	routes.RegisterSwaggerRoutes(r)
+	routes.RegisterRoutes(r, srv)
 
-	// Serve and listen
-	log.Fatal(http.ListenAndServe(":"+port, r))
+	server := &http.Server{
+		Addr:         fmt.Sprintf(":%d", c.Server.Port),
+		Handler:      r,
+		ReadTimeout:  c.Server.TimeoutRead,
+		WriteTimeout: c.Server.TimeoutWrite,
+		IdleTimeout:  c.Server.TimeoutIdle,
+	}
+
+	log.Println("Starting server " + server.Addr)
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatal("Server startup failed")
+	}
+
 }

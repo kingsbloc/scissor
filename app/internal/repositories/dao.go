@@ -9,6 +9,7 @@ import (
 var DB *gorm.DB
 
 type DAO interface {
+	NewUserQuery() UserQuery
 }
 
 type dao struct{}
@@ -16,6 +17,10 @@ type dao struct{}
 func NewDAO(db *gorm.DB) DAO {
 	DB = db
 	return &dao{}
+}
+
+func (d *dao) NewUserQuery() UserQuery {
+	return &userQuery{}
 }
 
 // Setup DB Connection
