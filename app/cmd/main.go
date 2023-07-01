@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/render"
 	"github.com/joho/godotenv"
 	"github.com/kingsbloc/scissor/internal/config"
+	"github.com/kingsbloc/scissor/internal/repositories"
 )
 
 func init() {
@@ -33,6 +34,16 @@ func main() {
 
 	// Connect Redis
 	config.ConnectRedis()
+
+	// Connect to DB
+	dbConn, dbErr := repositories.InitDB()
+	if dbErr != nil {
+		log.Fatal(dbErr)
+	}
+	log.Println("==== DB connected")
+
+	// Create New DAO
+	repositories.NewDAO(dbConn)
 
 	// Serve and listen
 	log.Fatal(http.ListenAndServe(":"+port, r))
