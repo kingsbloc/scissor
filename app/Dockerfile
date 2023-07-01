@@ -1,26 +1,24 @@
-FROM golang:1.18-bullseye as base
+#start building this image from this source (OS, etc...)
+FROM golang:1.19-alpine3.17
 
-FROM base as dev
-
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install --no-install-recommends -y libvips-dev && apt-get clean
-
-RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+ENV PROJECT_DIR=/app \
+    GO111MODULE=on \
+    CGO_ENABLED=0
 
 ENV APP_HOME /app
-RUN mkdir "$APP_HOME"
-
-
-ADD . "$APP_HOME"
 
 WORKDIR "$APP_HOME"
 
-COPY . "$APP_HOME"
+COPY go.mod ./
 
-# ADD docker-entrypoint.sh "$APP_HOME"
+RUN go mod download
 
-# RUN go mod tidy
+COPY . .
 
-EXPOSE 5000
+RUN ["go", "get", "github.com/swaggo/swag/cmd/swag"]
+RUN ["go", "install", "github.com/swaggo/swag/cmd/swag@latest"]
 
-# ENTRYPOINT ["sh", "/app/docker-entrypoint.sh"]
+RUN ["go", "get", "github.com/githubnemo/CompileDaemon"]
+RUN ["go", "install", "github.com/githubnemo/CompileDaemon"]
+
+ENTRYPOINT CompileDaemon -polling -log-prefix=false -exclude-dir="./docs" -build="swag init -g ./cmd/main.go --output ./docs && go build -o ./tmp/main ./cmd" -command="./tmp/main"
