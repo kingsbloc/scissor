@@ -13,6 +13,6 @@ func RegisterRoutes(r *chi.Mux, srv *app.MicroServices) {
 		ShortenRoutes(r, srv)
 	})
 	r.Route("/", func(r chi.Router) {
-		r.Get("/*", con.ResolveUrl)
+		r.Get("/{id}", con.ResolveUrl)
 	})
 }

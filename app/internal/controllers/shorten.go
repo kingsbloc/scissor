@@ -126,7 +126,7 @@ func (con *shortenController) ShortenUrl(w http.ResponseWriter, r *http.Request)
 // @Failure 422 {object} utils.ApiResponse{data=[]utils.ValidationError}
 // @Router /{id} [get]
 func (con *shortenController) ResolveUrl(w http.ResponseWriter, r *http.Request) {
-	idParam := chi.URLParam(r, "*")
+	idParam := chi.URLParam(r, "id")
 
 	value, err := con.srv.RedisService.Get(idParam).Result()
 	if err == redis.Nil {
