@@ -71,8 +71,12 @@ func main() {
 
 	// create services
 	userService := services.NewUserService(dao)
+	authService := services.NewAuthService(dao)
+	jwtService := services.NewJwtService()
+	shortenService := services.NewShortenService(dao)
 
-	srv := app.NewMicroServices(userService)
+	// initialize Microservices
+	srv := app.NewMicroServices(userService, authService, jwtService, shortenService)
 
 	// Register Routes
 	routes.RegisterSwaggerRoutes(r)

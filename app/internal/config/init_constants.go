@@ -26,3 +26,10 @@ func InitConstants() {
 	docs.SwaggerInfo.Schemes = SCHEMES
 	docs.SwaggerInfo.BasePath = "/"
 }
+
+type contextKey int
+
+const (
+	AccountID contextKey = iota
+	JWTAuthContext
+)

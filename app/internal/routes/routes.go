@@ -8,5 +8,6 @@ import (
 func RegisterRoutes(r *chi.Mux, srv *app.MicroServices) {
 	r.Route("/api/v1", func(r chi.Router) {
 		AuthRoutes(r, srv)
+		ShortenRoutes(r, srv)
 	})
 }

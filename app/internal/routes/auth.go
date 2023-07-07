@@ -10,5 +10,6 @@ func AuthRoutes(r chi.Router, srv *app.MicroServices) {
 	con := controllers.NewAuthController(srv)
 	r.Route("/auth", func(r chi.Router) {
 		r.Post("/signup", con.SignUp)
+		r.Post("/signin", con.Signin)
 	})
 }
