@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+	"github.com/go-redis/redis/v8"
 	"github.com/kingsbloc/scissor/internal/app"
 	"github.com/kingsbloc/scissor/internal/config"
 	"github.com/kingsbloc/scissor/internal/dto"
@@ -117,10 +119,31 @@ func (con *shortenController) ShortenUrl(w http.ResponseWriter, r *http.Request)
 // @Tags Shorten
 // @Accept	json
 // @Produce	json
-// @Param id path int true "Course ID"
-// @Success 201 {object} utils.ApiResponse{data=dto.AddShortenDto}
+// @Param id path int true "Shorten ID"
+// @Success 201 {object} utils.ApiResponse{data=string}
 // @Failure 400 {object} utils.ApiResponse
 // @Failure 500 {object} utils.ApiResponse
 // @Failure 422 {object} utils.ApiResponse{data=[]utils.ValidationError}
-// @Router /api/v1/shorten/{id} [get]
-func (con *shortenController) ResolveUrl(w http.ResponseWriter, r *http.Request) {}
+// @Router /{id} [get]
+func (con *shortenController) ResolveUrl(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "*")
+
+	value, err := con.srv.RedisService.Get(idParam).Result()
+	if err == redis.Nil {
+		render.Render(w, r, &utils.ApiResponse{
+			Status:  http.StatusNotFound,
+			Message: "Not Found",
+			Success: false,
+		})
+		return
+	} else if err != nil {
+		render.Render(w, r, &utils.ApiResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "Internal Error",
+			Success: false,
+		})
+		return
+	}
+
+	http.Redirect(w, r, value, http.StatusMovedPermanently)
+}

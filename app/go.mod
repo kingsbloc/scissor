@@ -39,6 +39,7 @@ require (
 
 require (
 	github.com/ajg/form v1.5.1 // indirect
+	github.com/go-chi/httprate v0.7.4
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt v3.2.2+incompatible

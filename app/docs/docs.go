@@ -253,7 +253,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/shorten/{id}": {
+        "/{id}": {
             "get": {
                 "description": "Redirect or Resolve Url.",
                 "consumes": [
@@ -269,7 +269,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Course ID",
+                        "description": "Shorten ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -287,7 +287,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/dto.AddShortenDto"
+                                            "type": "string"
                                         }
                                     }
                                 }

@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/httprate"
 	"github.com/go-chi/render"
 	"github.com/joho/godotenv"
 	"github.com/kingsbloc/scissor/internal/app"
@@ -50,6 +52,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(render.SetContentType(render.ContentTypeJSON))
+	r.Use(httprate.LimitByIP(100, 1*time.Minute))
 
 	// Connect Redis
 	rdb := config.ConnectRedis()
