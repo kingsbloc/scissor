@@ -10,6 +10,7 @@ var DB *gorm.DB
 
 type DAO interface {
 	NewUserQuery() UserQuery
+	NewShortenQuery() ShortenQuery
 }
 
 type dao struct{}
@@ -21,6 +22,9 @@ func NewDAO(db *gorm.DB) DAO {
 
 func (d *dao) NewUserQuery() UserQuery {
 	return &userQuery{}
+}
+func (d *dao) NewShortenQuery() ShortenQuery {
+	return &shortenQuery{}
 }
 
 // Setup DB Connection

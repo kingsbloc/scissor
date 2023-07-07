@@ -66,7 +66,7 @@ func main() {
 
 	// AutoMigrate Models
 	repositories.AutoMigrate([]interface{}{
-		&models.User{},
+		&models.User{}, &models.Shorten{},
 	}, dbConn)
 
 	// Create New DAO

@@ -95,9 +95,13 @@ func (con *shortenController) ShortenUrl(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	body.CustomUrl = config.New().Server.ServerUrl + "/" + id
+
 	if userId != "" {
-		// TODO save to user with gorotine
-		go log.Println("")
+		// save to user with gorotine
+		go func() {
+			con.srv.UserService.AddNewShorten(body, userId)
+		}()
 	}
 
 	render.Render(w, r, &utils.ApiResponse{
@@ -106,7 +110,7 @@ func (con *shortenController) ShortenUrl(w http.ResponseWriter, r *http.Request)
 		Success: true,
 		Data: map[string]interface{}{
 			"url":          body.Url,
-			"custom_short": config.New().Server.ServerUrl + "/" + id,
+			"custom_short": body.CustomUrl,
 			"expiry":       body.Exp,
 		},
 	})
