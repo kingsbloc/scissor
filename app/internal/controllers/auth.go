@@ -57,7 +57,6 @@ func (con *authController) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.Status(r, http.StatusCreated)
 	render.Render(w, r, &utils.ApiResponse{
 		Status:  http.StatusCreated,
 		Message: "Account Created Successfully",

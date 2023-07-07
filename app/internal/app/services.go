@@ -7,13 +7,15 @@ type MicroServices struct {
 	AuthService    services.AuthService
 	JwtService     services.JwtService
 	ShortenService services.ShortenService
+	RedisService   services.RedisService
 }
 
-func NewMicroServices(userService services.UserService, authService services.AuthService, jwtService services.JwtService, shortenService services.ShortenService) *MicroServices {
+func NewMicroServices(userService services.UserService, authService services.AuthService, jwtService services.JwtService, shortenService services.ShortenService, redisService services.RedisService) *MicroServices {
 	return &MicroServices{
 		UserService:    userService,
 		AuthService:    authService,
 		JwtService:     jwtService,
 		ShortenService: shortenService,
+		RedisService:   redisService,
 	}
 }

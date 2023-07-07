@@ -52,7 +52,7 @@ func main() {
 	r.Use(render.SetContentType(render.ContentTypeJSON))
 
 	// Connect Redis
-	config.ConnectRedis()
+	rdb := config.ConnectRedis()
 
 	// Connect to DB
 	dbConn, dbErr := repositories.InitDB()
@@ -74,9 +74,10 @@ func main() {
 	authService := services.NewAuthService(dao)
 	jwtService := services.NewJwtService()
 	shortenService := services.NewShortenService(dao)
+	redisService := services.NewRedisService(rdb)
 
 	// initialize Microservices
-	srv := app.NewMicroServices(userService, authService, jwtService, shortenService)
+	srv := app.NewMicroServices(userService, authService, jwtService, shortenService, redisService)
 
 	// Register Routes
 	routes.RegisterSwaggerRoutes(r)

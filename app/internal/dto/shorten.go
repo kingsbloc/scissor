@@ -5,7 +5,7 @@ import "net/http"
 type AddShortenDto struct {
 	Url       string `json:"url" validate:"http_url,required"`
 	CustomUrl string `json:"custom_url"`
-	Exp       int32  `json:"exp"`
+	Exp       int32  `json:"exp" default:"0"`
 }
 
 func (a *AddShortenDto) Bind(r *http.Request) error {

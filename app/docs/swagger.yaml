@@ -5,6 +5,7 @@ definitions:
       custom_url:
         type: string
       exp:
+        default: 0
         type: integer
       url:
         type: string
@@ -177,7 +178,7 @@ paths:
             - $ref: '#/definitions/utils.ApiResponse'
             - properties:
                 data:
-                  type: boolean
+                  $ref: '#/definitions/dto.AddShortenDto'
               type: object
         "400":
           description: Bad Request
@@ -199,6 +200,51 @@ paths:
           schema:
             $ref: '#/definitions/utils.ApiResponse'
       summary: Shorten Url.
+      tags:
+      - Shorten
+  /api/v1/shorten/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Redirect or Resolve Url.
+      parameters:
+      - description: Course ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AddShortenDto'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.ApiResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/utils.ValidationError'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      summary: Resolve Url.
       tags:
       - Shorten
 securityDefinitions:

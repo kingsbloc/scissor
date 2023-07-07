@@ -18,6 +18,7 @@ type ConfServer struct {
 	TimeoutRead  time.Duration `env:"SERVER_TIMEOUT_READ,required"`
 	TimeoutIdle  time.Duration `env:"SERVER_TIMEOUT_IDLE,required"`
 	Debug        bool          `env:"SERVER_DEBUG,required"`
+	ServerUrl    string        `env:"SERVER_URL,required"`
 }
 type ConfJWT struct {
 	Access_secret  string `env:"JWT_ACCESS_SECRET,required"`
