@@ -8,7 +8,7 @@ import (
 
 func ShortenRoutes(r chi.Router, srv *app.MicroServices) {
 	con := controllers.NewShortenController(srv)
-	r.With(srv.JwtService.JWTAuth).Route("/shorten", func(r chi.Router) {
+	r.With(srv.JwtService.JWTAuthPassive).Route("/shorten", func(r chi.Router) {
 		r.Post("/", con.ShortenUrl)
 	})
 }

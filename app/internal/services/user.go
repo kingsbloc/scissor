@@ -15,6 +15,8 @@ import (
 type UserService interface {
 	NewUser(dto *dto.AddUserDto) (bool, error)
 	AddNewShorten(dto dto.AddShortenDto, id string) *gorm.DB
+	ShortenHistory(id string) []models.Shorten
+	DeleteShorten(shortenId string, id string) (*models.Shorten, bool)
 }
 
 type userService struct {
@@ -47,4 +49,21 @@ func (s *userService) NewUser(dto *dto.AddUserDto) (bool, error) {
 func (s *userService) AddNewShorten(dto dto.AddShortenDto, id string) *gorm.DB {
 	userId, _ := strconv.Atoi(id)
 	return s.dao.NewShortenQuery().Add(dto, uint(userId))
+}
+
+func (s *userService) ShortenHistory(id string) []models.Shorten {
+	userId, _ := strconv.Atoi(id)
+	return s.dao.NewShortenQuery().ListByUserID(uint(userId))
+}
+
+func (s *userService) DeleteShorten(shortenId string, id string) (*models.Shorten, bool) {
+	userId, _ := strconv.Atoi(id)
+	shortId, _ := strconv.Atoi(shortenId)
+	result, ok := s.dao.NewShortenQuery().Delete(uint(shortId), uint(userId))
+
+	if ok.Error != nil || ok.RowsAffected == 0 {
+		return nil, false
+	} else {
+		return &result, true
+	}
 }

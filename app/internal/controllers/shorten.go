@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 	"time"
 
@@ -44,7 +43,6 @@ func (con *shortenController) ShortenUrl(w http.ResponseWriter, r *http.Request)
 	_id := con.srv.JwtService.GetJWTAuthContext(r).Get("id")
 	if len(_id) > 0 {
 		userId = _id
-		log.Println(userId)
 	}
 	var body dto.AddShortenDto
 	if err := render.Bind(r, &body); err != nil {
@@ -95,7 +93,7 @@ func (con *shortenController) ShortenUrl(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	body.CustomUrl = config.New().Server.ServerUrl + "/" + id
+	body.CustomUrl = id
 
 	if userId != "" {
 		// save to user with gorotine
@@ -110,7 +108,7 @@ func (con *shortenController) ShortenUrl(w http.ResponseWriter, r *http.Request)
 		Success: true,
 		Data: map[string]interface{}{
 			"url":          body.Url,
-			"custom_short": body.CustomUrl,
+			"custom_short": config.New().Server.ServerUrl + "/" + body.CustomUrl,
 			"expiry":       body.Exp,
 		},
 	})

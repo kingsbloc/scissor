@@ -7,9 +7,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-chi/render"
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"github.com/kingsbloc/scissor/internal/config"
+	"github.com/kingsbloc/scissor/internal/utils"
 	"gopkg.in/square/go-jose.v2"
 )
 
@@ -35,6 +37,7 @@ type JwtService interface {
 	VerifyJWT(tokenString string, isRefresh bool) (*jwt.Token, error)
 	EncryptJWT(jwtToken string) (any, error)
 	JWTAuth(next http.Handler) http.Handler
+	JWTAuthPassive(next http.Handler) http.Handler
 	GetJWTAuthContext(r *http.Request) JWTAuthContext
 }
 
@@ -51,9 +54,10 @@ var (
 	JWT_REFRESH_SECRET = c.Jwt.Refresh_secret
 	JWT_ISSUER         = c.Jwt.Issuer
 	JWT_AUDIENCE       = c.Jwt.Audience
-	jwtAccessSecret    = []byte(JWT_ACCESS_SECRET)
-	jwtRefreshSecret   = []byte(JWT_REFRESH_SECRET)
 )
+
+var jwtAccessSecret = []byte(c.Jwt.Access_secret)
+var jwtRefreshSecret = []byte(c.Jwt.Refresh_secret)
 
 type JWTClaim struct {
 	Email string `json:"email"`
@@ -77,12 +81,12 @@ func (j *jwtService) GenerateJWT(email string, id string, isRefresh bool) (token
 			Audience:  JWT_AUDIENCE,
 		},
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	if isRefresh {
-		tokenString, err := token.SignedString(jwtAccessSecret)
+		tokenString, err := token.SignedString(jwtRefreshSecret)
 		return tokenString, err
 	} else {
-		tokenString, err := token.SignedString(jwtRefreshSecret)
+		tokenString, err := token.SignedString(jwtAccessSecret)
 		return tokenString, err
 	}
 }
@@ -137,7 +141,7 @@ func (j *jwtService) EncryptJWT(jwtToken string) (any, error) {
 	return key, err
 }
 
-func (s *jwtService) JWTAuth(next http.Handler) http.Handler {
+func (s *jwtService) JWTAuthPassive(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var jwtAuthContext = JWTAuthContext{map[string]string{
 			"email": "",
@@ -156,6 +160,44 @@ func (s *jwtService) JWTAuth(next http.Handler) http.Handler {
 		if !ok && !token.Valid {
 			ctx := context.WithValue(r.Context(), config.JWTAuthContext, jwtAuthContext)
 			next.ServeHTTP(w, r.WithContext(ctx))
+			return
+		}
+
+		jwtAuthContext = JWTAuthContext{map[string]string{
+			"email": claims["email"].(string),
+			"id":    claims["id"].(string),
+		}}
+
+		ctx := context.WithValue(r.Context(), config.JWTAuthContext, jwtAuthContext)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func (s *jwtService) JWTAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var jwtAuthContext = JWTAuthContext{map[string]string{
+			"email": "",
+			"id":    "",
+		}}
+
+		tokenString := extractToken(r)
+		token, err := s.VerifyJWT(tokenString, false)
+		if err != nil {
+			render.Render(w, r, &utils.ApiResponse{
+				Status:  http.StatusUnauthorized,
+				Message: err.Error(),
+				Success: false,
+			})
+			return
+		}
+
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok && !token.Valid {
+			render.Render(w, r, &utils.ApiResponse{
+				Status:  http.StatusUnauthorized,
+				Message: "Invalid Token",
+				Success: false,
+			})
 			return
 		}
 

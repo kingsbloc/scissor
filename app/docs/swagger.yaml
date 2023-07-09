@@ -247,6 +247,86 @@ paths:
       summary: Shorten Url.
       tags:
       - Shorten
+  /api/v1/user/history:
+    get:
+      consumes:
+      - application/json
+      description: History of Shorten Url.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.ApiResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.AddShortenDto'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.ApiResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/utils.ValidationError'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      summary: History of Shorten Url.
+      tags:
+      - User
+  /api/v1/user/history/:id:
+    post:
+      consumes:
+      - application/json
+      description: Delete Shorten Url.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.ApiResponse'
+            - properties:
+                data:
+                  type: boolean
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.ApiResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/utils.ValidationError'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      summary: Delete Shorten Url.
+      tags:
+      - User
 securityDefinitions:
   ApiKeyAuth:
     in: header

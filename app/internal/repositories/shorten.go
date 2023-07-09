@@ -4,11 +4,13 @@ import (
 	"github.com/kingsbloc/scissor/internal/dto"
 	"github.com/kingsbloc/scissor/internal/models"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type ShortenQuery interface {
 	Add(dto dto.AddShortenDto, userId uint) *gorm.DB
 	ListByUserID(id uint) []models.Shorten
+	Delete(id uint, userId uint) (models.Shorten, *gorm.DB)
 }
 
 type shortenQuery struct{}
@@ -22,6 +24,12 @@ func (s *shortenQuery) Add(dto dto.AddShortenDto, userId uint) *gorm.DB {
 	})
 	return result
 
+}
+
+func (s *shortenQuery) Delete(id uint, userId uint) (models.Shorten, *gorm.DB) {
+	var shorten models.Shorten
+	result := DB.Clauses(clause.Returning{}).Where(&models.Shorten{UserID: userId, ID: id}).Delete(&shorten)
+	return shorten, result
 }
 
 func (s *shortenQuery) ListByUserID(id uint) []models.Shorten {

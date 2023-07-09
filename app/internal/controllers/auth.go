@@ -3,6 +3,7 @@ package controllers
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"sync"
 
 	"github.com/go-chi/render"
@@ -97,7 +98,7 @@ func (con *authController) Signin(w http.ResponseWriter, r *http.Request) {
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		jwt1, err := con.srv.JwtService.GenerateJWT(user.Email, string(rune(user.ID)), false)
+		jwt1, err := con.srv.JwtService.GenerateJWT(user.Email, strconv.FormatUint(uint64(user.ID), 10), false)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -105,7 +106,7 @@ func (con *authController) Signin(w http.ResponseWriter, r *http.Request) {
 	}()
 	go func() {
 		defer wg.Done()
-		refreshJWT1, err := con.srv.JwtService.GenerateJWT(user.Email, string(rune(user.ID)), true)
+		refreshJWT1, err := con.srv.JwtService.GenerateJWT(user.Email, strconv.FormatUint(uint64(user.ID), 10), true)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/kingsbloc/scissor/internal/config"
 	"gorm.io/gorm"
 )
 
@@ -15,4 +16,17 @@ type Shorten struct {
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `json:"deleted_at" swaggertype:"primitive,string"`
+}
+
+func (c *Shorten) ToBase() Shorten {
+	return Shorten{
+		ID:          c.ID,
+		UserID:      c.UserID,
+		Url:         c.Url,
+		CustomShort: config.New().Server.ServerUrl + "/" + c.CustomShort,
+		Exp:         c.Exp,
+		CreatedAt:   c.CreatedAt,
+		UpdatedAt:   c.UpdatedAt,
+		DeletedAt:   c.DeletedAt,
+	}
 }
