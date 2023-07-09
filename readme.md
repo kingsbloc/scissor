@@ -5,7 +5,7 @@ Scissor is an app  for shorten url built with go, postgresql and redis
 #### Steps
  1. Ensure you have go installed
  2. Ensure you have docker and docker compose installed
- 3. create a .env file with the following variables: - 
+ 3. create a .env file inside the app directory with the following variables: - 
      - PORT
      - SERVER_TIMEOUT_READ
      - SERVER_TIMEOUT_WRITE
