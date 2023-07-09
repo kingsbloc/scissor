@@ -14,8 +14,8 @@ var (
 
 func InitConstants() {
 	if os.Getenv("APP_ENV") == "production" {
-		HOST_URL = "sms.herokuapp.com"
-		SCHEMES = []string{"https"}
+		HOST_URL = "ec2-44-211-80-65.compute-1.amazonaws.com"
+		SCHEMES = []string{"http"}
 	} else {
 		HOST_URL = os.Getenv("SERVER_URL")
 		SCHEMES = []string{"http"}
